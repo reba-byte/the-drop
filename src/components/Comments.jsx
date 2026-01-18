@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useGroup } from '../context/GroupContext'
+import Reactions from './Reactions'
 
 export default function Comments({ weekId }) {
   const { member } = useGroup()
@@ -77,7 +78,7 @@ export default function Comments({ weekId }) {
       ) : comments.length === 0 ? (
         <p className="text-slate-500 text-sm mb-4">No comments yet. Start the conversation!</p>
       ) : (
-        <div className="space-y-3 mb-4">
+        <div className="space-y-4 mb-4">
           {comments.map((comment) => (
             <div key={comment.id} className="bg-slate-800/30 rounded-lg p-3">
               <div className="flex items-center gap-2 mb-1">
@@ -85,7 +86,12 @@ export default function Comments({ weekId }) {
                 <span className="text-slate-300 text-sm font-medium">{comment.member?.name}</span>
                 <span className="text-slate-600 text-xs">{timeAgo(comment.created_at)}</span>
               </div>
-              <p className="text-slate-200 text-sm pl-7">{comment.text}</p>
+              <p className="text-slate-200 text-sm pl-7 mb-3">{comment.text}</p>
+              
+              {/* Reactions to this comment */}
+              <div className="pl-7">
+                <Reactions targetId={comment.id} type="comment" />
+              </div>
             </div>
           ))}
         </div>

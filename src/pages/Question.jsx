@@ -11,6 +11,7 @@ import Trivia from '../components/questions/Trivia'
 import Comments from '../components/Comments'
 import RankThese from '../components/questions/RankThese'
 import Prediction from '../components/questions/Prediction'
+import Reactions from '../components/Reactions'
 
 const colorMap = {
   debate: 'from-rose-950',
@@ -179,6 +180,14 @@ useEffect(() => {
             {week.category}
           </span>
         </div>
+
+{/* Reactions to Question Results */}
+<div className="bg-slate-800/30 rounded-xl p-4 mb-6">
+  <h3 className="text-slate-400 text-sm font-medium mb-3 uppercase tracking-wider">
+    React to Results
+  </h3>
+  <Reactions targetId={week.id} type="question" />
+</div>
 
         {/* Question component */}
         {renderQuestion()}
