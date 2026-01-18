@@ -63,7 +63,6 @@ export default function Question() {
       const mine = answersData?.find(a => a.member_id === member?.id)
       setMyAnswer(mine || null)
 
-      // Get total ACTIVE member count (only those who have signed up)
 // Get total member count (including placeholders)
 const { data: membersData } = await supabase
   .from('members')
