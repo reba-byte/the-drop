@@ -1,28 +1,10 @@
 export async function requestNotificationPermission() {
-  // DEBUG: Check what's available
-  alert(`Check 1:
-serviceWorker: ${'serviceWorker' in navigator}
-Notification: ${'Notification' in window}
-PushManager: ${'PushManager' in window}`)
-
   // Wait for service worker to be ready first
   if (!('serviceWorker' in navigator)) {
     throw new Error('Service workers not supported')
   }
   
-  try {
-    await navigator.serviceWorker.ready
-    alert('Service worker is ready!')
-  } catch (error) {
-    alert('Service worker failed: ' + error.message)
-    throw error
-  }
-  
-  // Now check again
-  const reg = await navigator.serviceWorker.ready
-  alert(`Check 2 (after SW ready):
-PushManager in window: ${'PushManager' in window}
-pushManager on reg: ${!!reg.pushManager}`)
+  await navigator.serviceWorker.ready
   
   // Now check push support
   if (!('Notification' in window)) {
@@ -48,23 +30,19 @@ pushManager on reg: ${!!reg.pushManager}`)
 }
 
 async function subscribeUserToPush() {
-  // Make sure service worker is ready
   const registration = await navigator.serviceWorker.ready
   
-  // Check if already subscribed
   let subscription = await registration.pushManager.getSubscription()
   
   if (subscription) {
     return subscription
   }
   
-  // Get the VAPID key
   const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY
   if (!vapidKey) {
     throw new Error('VAPID key not configured')
   }
   
-  // Create new subscription
   subscription = await registration.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(vapidKey)
