@@ -1,35 +1,25 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
+const VAPID_PUBLIC_KEY = Deno.env.get('VAPID_PUBLIC_KEY')!
+const VAPID_PRIVATE_KEY = Deno.env.get('VAPID_PRIVATE_KEY')!
 
 serve(async (req) => {
   try {
-    const { phone_numbers, message } = await req.json()
+    const { subscriptions, title, body, url } = await req.json()
     
-    // Convert phone numbers to Verizon email addresses
-    const verizonEmails = phone_numbers.map((num: string) => {
-      // Remove any formatting (dashes, spaces, parentheses)
-      const cleaned = num.replace(/\D/g, '')
-      return `${cleaned}@vtext.com`
-    })
+    const results = await Promise.all(
+      subscriptions.map(async (subscription: any) => {
+        try {
+          await sendPushNotification(subscription, { title, body, url })
+          return { success: true }
+        } catch (error) {
+          console.error('Failed to send to subscription:', error)
+          return { success: false, error: error.message }
+        }
+      })
+    )
     
-    // Send via Resend
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-from: 'The Drop <notifications@thedropgame.app>',        to: verizonEmails,
-        subject: '', // Leave blank - SMS doesn't show subjects
-        text: message,
-      }),
-    })
-
-    const data = await response.json()
-    
-    return new Response(JSON.stringify({ success: true, data }), {
+    return new Response(JSON.stringify({ results }), {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error) {
@@ -39,3 +29,55 @@ from: 'The Drop <notifications@thedropgame.app>',        to: verizonEmails,
     })
   }
 })
+
+async function sendPushNotification(subscription: any, payload: any) {
+  const vapidHeaders = generateVAPIDHeaders(subscription.endpoint)
+  
+  const response = await fetch(subscription.endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'TTL': '86400',
+      ...vapidHeaders,
+    },
+    body: JSON.stringify(payload),
+  })
+  
+  if (!response.ok) {
+    throw new Error(`Push failed: ${response.status}`)
+  }
+}
+
+function generateVAPIDHeaders(endpoint: string) {
+  const url = new URL(endpoint)
+  const audience = `${url.protocol}//${url.host}`
+  
+  const vapidHeaders = {
+    'Authorization': `vapid t=${createJWT(audience)}, k=${VAPID_PUBLIC_KEY}`,
+  }
+  
+  return vapidHeaders
+}
+
+function createJWT(audience: string): string {
+  const header = { typ: 'JWT', alg: 'ES256' }
+  const jwtData = {
+    aud: audience,
+    exp: Math.floor(Date.now() / 1000) + 12 * 60 * 60,
+    sub: 'mailto:notifications@thedropgame.app',
+  }
+  
+  const encodedHeader = base64UrlEncode(JSON.stringify(header))
+  const encodedData = base64UrlEncode(JSON.stringify(jwtData))
+  const unsignedToken = `${encodedHeader}.${encodedData}`
+  
+  // For now, return unsigned (we'll need to add proper signing later)
+  return unsignedToken
+}
+
+function base64UrlEncode(str: string): string {
+  return btoa(str)
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '')
+}

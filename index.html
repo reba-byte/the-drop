@@ -6,28 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>the-drop</title>
     
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    
-    <!-- Initialize OneSignal after everything loads -->
-    <script>
-      window.addEventListener('load', function() {
-        setTimeout(function() {
-          if (window.OneSignal) {
-            window.OneSignal.init({
-              appId: "d1ed5b32-2eed-44b7-9b70-747de55a3573",
-              allowLocalhostAsSecureOrigin: true,
-            }).then(function() {
-              console.log('OneSignal initialized!');
-            }).catch(function(error) {
-              console.error('OneSignal init error:', error);
-            });
-          }
-        }, 1000);
-      });
-    </script>
   </body>
 </html>
