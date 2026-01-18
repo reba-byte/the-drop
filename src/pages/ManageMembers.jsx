@@ -213,7 +213,7 @@ export default function ManageMembers() {
                 </div>
               </div>
               
-              {m.id !== member.id && !m.user_id && (
+              {m.id !== member.id && (
                 <button
                   onClick={() => handleDeleteMember(m.id)}
                   className="text-red-400 hover:text-red-300 text-sm"
