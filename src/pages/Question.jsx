@@ -63,14 +63,15 @@ export default function Question() {
       const mine = answersData?.find(a => a.member_id === member?.id)
       setMyAnswer(mine || null)
 
-      // Get total member count for this group
-      const { data: membersData } = await supabase
-        .from('members')
-        .select('id')
-        .eq('group_id', weekData.group_id)
+      // Get total ACTIVE member count (only those who have signed up)
+const { data: membersData } = await supabase
+  .from('members')
+  .select('id')
+  .eq('group_id', weekData.group_id)
+  .not('user_id', 'is', null)
 
-      const totalMembers = membersData?.length || 0
-      const allAnswered = answersData?.length >= totalMembers
+const totalMembers = membersData?.length || 0
+const allAnswered = answersData?.length >= totalMembers && totalMembers > 0
 
       // Check if results should be revealed
       const now = new Date()
