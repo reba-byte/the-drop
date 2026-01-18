@@ -119,6 +119,7 @@ export default function Reactions({ targetId, type }) {
                   : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                 }
               `}
+              title={label}
             >
               <span>{emoji}</span>
               <span className="font-medium">{count}</span>
