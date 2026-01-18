@@ -18,24 +18,24 @@ export default function NotificationPrompt() {
   }, [])
 
   const handleEnable = async () => {
-    try {
-      const subscription = await requestNotificationPermission()
-      
-      // Save subscription to database
-      await supabase
-        .from('push_subscriptions')
-        .upsert({
-          member_id: member.id,
-          subscription: subscription.toJSON(),
-        })
-      
-      setShowPrompt(false)
-      alert('Notifications enabled! 🎉')
-    } catch (error) {
-      console.error('Error enabling notifications:', error)
-      alert('Could not enable notifications. Please check your browser settings.')
-    }
+  try {
+    const subscription = await requestNotificationPermission()
+    
+    // Save subscription to database
+    await supabase
+      .from('push_subscriptions')
+      .upsert({
+        member_id: member.id,
+        subscription: subscription.toJSON(),
+      })
+    
+    setShowPrompt(false)
+    // Remove the alert - just close silently since browser already confirmed
+  } catch (error) {
+    console.error('Error enabling notifications:', error)
+    alert('Could not enable notifications. Please try again or check your browser settings.')
   }
+}
 
   const handleDismiss = () => {
     setShowPrompt(false)
