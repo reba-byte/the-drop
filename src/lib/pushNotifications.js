@@ -1,10 +1,28 @@
 export async function requestNotificationPermission() {
+  // DEBUG: Check what's available
+  alert(`Check 1:
+serviceWorker: ${'serviceWorker' in navigator}
+Notification: ${'Notification' in window}
+PushManager: ${'PushManager' in window}`)
+
   // Wait for service worker to be ready first
   if (!('serviceWorker' in navigator)) {
     throw new Error('Service workers not supported')
   }
   
-  await navigator.serviceWorker.ready
+  try {
+    await navigator.serviceWorker.ready
+    alert('Service worker is ready!')
+  } catch (error) {
+    alert('Service worker failed: ' + error.message)
+    throw error
+  }
+  
+  // Now check again
+  const reg = await navigator.serviceWorker.ready
+  alert(`Check 2 (after SW ready):
+PushManager in window: ${'PushManager' in window}
+pushManager on reg: ${!!reg.pushManager}`)
   
   // Now check push support
   if (!('Notification' in window)) {
