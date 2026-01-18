@@ -110,19 +110,19 @@ export default function Reactions({ targetId, type }) {
           
           return (
             <button
-  key={label}
-  onClick={() => toggleReaction(label)}
-  className={`
-    flex flex-col items-center gap-1 p-2 rounded-lg transition-all
-    ${isActive 
-      ? 'bg-violet-600 text-white' 
-      : 'hover:bg-slate-700 text-slate-300'
-    }
-  `}
->
-  <span className="text-2xl">{emoji}</span>
-  <span className="text-[10px] leading-tight">{label}</span>
-</button>
+              key={label}
+              onClick={() => toggleReaction(label)}
+              className={`
+                flex items-center gap-1 px-2 py-1 rounded-full text-xs transition-all
+                ${isActive 
+                  ? 'bg-violet-600 text-white' 
+                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                }
+              `}
+            >
+              <span>{emoji}</span>
+              <span className="font-medium">{count}</span>
+            </button>
           )
         })}
         
@@ -157,13 +157,13 @@ export default function Reactions({ targetId, type }) {
                     className={`
                       flex flex-col items-center gap-1 p-2 rounded-lg transition-all
                       ${isActive 
-                        ? 'bg-violet-600' 
-                        : 'hover:bg-slate-700'
+                        ? 'bg-violet-600 text-white' 
+                        : 'hover:bg-slate-700 text-slate-300'
                       }
                     `}
-                    title={label}
                   >
                     <span className="text-2xl">{emoji}</span>
+                    <span className="text-[10px] leading-tight text-center">{label}</span>
                   </button>
                 )
               })}
