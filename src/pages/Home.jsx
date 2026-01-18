@@ -82,21 +82,35 @@ export default function Home() {
         
 {/* Header with Logo */}
 <div className="text-center mb-8">
-  <div className="inline-block mb-3">
-    <div className="relative">
-      {/* Bold outlined badge */}
-      <div className="border-4 border-violet-500 rounded-2xl px-8 py-4 bg-slate-900/50 backdrop-blur-sm shadow-2xl transform hover:scale-105 transition-transform">
-        <div className="flex items-center gap-4">
-          {/* Flame icon - custom SVG */}
-          <svg width="40" height="40" viewBox="0 0 40 40" className="animate-pulse">
-            ...
-          </svg>
-          <h1 className="text-4xl font-black text-white tracking-tight">THE DROP</h1>
+  <div className="inline-block mb-3 relative">
+    {/* Glowing background effect */}
+    <div className="absolute inset-0 bg-red-500 blur-xl opacity-30 animate-pulse"></div>
+    
+    {/* Main badge */}
+    <div className="relative bg-gradient-to-br from-slate-900 to-black border-2 border-red-500 rounded-lg px-6 py-3 shadow-2xl">
+      <div className="flex items-center gap-3">
+        {/* Lightning bolt SVG */}
+        <svg width="35" height="35" viewBox="0 0 35 35" className="drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]">
+          <path 
+            d="M20 2 L8 18 L16 18 L14 32 L28 14 L19 14 Z" 
+            fill="#ef4444"
+            stroke="#fca5a5"
+            strokeWidth="1"
+          />
+        </svg>
+        <div>
+          <h1 className="text-3xl font-black text-white tracking-wider uppercase" style={{textShadow: '0 0 10px rgba(239,68,68,0.5)'}}>
+            THE DROP
+          </h1>
+        </div>
+        {/* Target/crosshair accent */}
+        <div className="w-8 h-8 rounded-full border-2 border-red-500 flex items-center justify-center">
+          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
         </div>
       </div>
     </div>
   </div>
-  <p className="text-slate-400">{group.name}</p>
+  <p className="text-slate-400 text-sm uppercase tracking-widest">{group.name}</p>
 </div>
 
         {/* User info */}
