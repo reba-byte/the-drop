@@ -17,6 +17,7 @@ export default function ManageMembers() {
   const [loading, setLoading] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
   const [newMemberName, setNewMemberName] = useState('')
+  const [newMemberEmail, setNewMemberEmail] = useState('')
   const [newMemberEmoji, setNewMemberEmoji] = useState('👤')
   const [saving, setSaving] = useState(false)
 
@@ -43,7 +44,7 @@ export default function ManageMembers() {
 
   async function handleAddMember(e) {
     e.preventDefault()
-    if (!newMemberName.trim() || saving) return
+    if (!newMemberName.trim() || !newMemberEmail.trim() || saving) return
 
     setSaving(true)
 
@@ -52,6 +53,7 @@ export default function ManageMembers() {
       .insert({
         group_id: group.id,
         name: newMemberName.trim(),
+        email: newMemberEmail.trim().toLowerCase(),
         emoji: newMemberEmoji,
         user_id: null, // Placeholder - will be filled when they sign up
         is_curator: false
@@ -65,6 +67,7 @@ export default function ManageMembers() {
     } else {
       setMembers([...members, data])
       setNewMemberName('')
+      setNewMemberEmail('')
       setNewMemberEmoji('👤')
       setShowAddForm(false)
     }
@@ -150,6 +153,19 @@ export default function ManageMembers() {
             </div>
 
             <div className="mb-4">
+              <label className="block text-slate-400 text-sm mb-2">Email</label>
+              <input
+                type="email"
+                value={newMemberEmail}
+                onChange={(e) => setNewMemberEmail(e.target.value)}
+                placeholder="their-email@example.com"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white"
+                required
+              />
+              <p className="text-slate-500 text-xs mt-1">They'll use this email to claim their profile</p>
+            </div>
+
+            <div className="mb-4">
               <label className="block text-slate-400 text-sm mb-2">Emoji</label>
               <div className="grid grid-cols-10 gap-2">
                 {EMOJI_OPTIONS.map(emoji => (
@@ -174,7 +190,7 @@ export default function ManageMembers() {
             <div className="flex gap-2">
               <button
                 type="submit"
-                disabled={!newMemberName.trim() || saving}
+                disabled={!newMemberName.trim() || !newMemberEmail.trim() || saving}
                 className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:bg-slate-700 disabled:text-slate-500 text-white font-semibold py-2 px-4 rounded-lg"
               >
                 {saving ? 'Adding...' : 'Add Member'}
@@ -184,6 +200,7 @@ export default function ManageMembers() {
                 onClick={() => {
                   setShowAddForm(false)
                   setNewMemberName('')
+                  setNewMemberEmail('')
                   setNewMemberEmoji('👤')
                 }}
                 className="px-4 py-2 text-slate-400 hover:text-white"
@@ -207,7 +224,8 @@ export default function ManageMembers() {
                 <div>
                   <p className="text-white font-medium">{m.name}</p>
                   <p className="text-slate-500 text-xs">
-                    {m.user_id ? 'Active' : 'Not signed up yet'}
+                    {m.email}
+                    {m.user_id ? ' • Active' : ' • Not signed up yet'}
                     {m.is_curator && ' • Curator'}
                   </p>
                 </div>
@@ -227,7 +245,7 @@ export default function ManageMembers() {
 
         <div className="mt-8 p-4 bg-slate-800/20 rounded-xl border border-slate-700">
           <p className="text-slate-400 text-sm">
-            💡 <strong>Tip:</strong> Add all family members here first. When they sign up, they'll be able to claim their profile.
+            💡 <strong>Tip:</strong> Add all family members with their emails first. When they sign up with the group code, they'll automatically claim their profile if their email matches.
           </p>
         </div>
       </div>

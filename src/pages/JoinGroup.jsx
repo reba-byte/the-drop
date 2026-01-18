@@ -12,6 +12,7 @@ export default function JoinGroup() {
   const [step, setStep] = useState(1) // 1 = enter code, 2 = set profile
   const [inviteCode, setInviteCode] = useState('')
   const [group, setGroup] = useState(null)
+  const [claimedProfile, setClaimedProfile] = useState(null)
   const [name, setName] = useState('')
   const [emoji, setEmoji] = useState('👤')
   const [phone, setPhone] = useState('')
@@ -33,11 +34,28 @@ export default function JoinGroup() {
 
     if (fetchError || !data) {
       setError('Invalid invite code. Check with your group curator.')
-    } else {
-      setGroup(data)
-      setStep(2)
+      setLoading(false)
+      return
     }
 
+    // Check if there's a placeholder profile for this user's email
+    const { data: placeholderProfile } = await supabase
+      .from('members')
+      .select('*')
+      .eq('group_id', data.id)
+      .eq('email', user.email.toLowerCase())
+      .is('user_id', null)
+      .single()
+
+    if (placeholderProfile) {
+      // Found a profile to claim!
+      setClaimedProfile(placeholderProfile)
+      setName(placeholderProfile.name)
+      setEmoji(placeholderProfile.emoji)
+    }
+
+    setGroup(data)
+    setStep(2)
     setLoading(false)
   }
 
@@ -51,7 +69,7 @@ export default function JoinGroup() {
     setLoading(true)
     setError('')
 
-    // Check if already a member
+    // Check if already a member with this user_id
     const { data: existingMember } = await supabase
       .from('members')
       .select('*')
@@ -65,23 +83,42 @@ export default function JoinGroup() {
       return
     }
 
-    // Create member record
-    const { error: insertError } = await supabase
-      .from('members')
-      .insert({
-        user_id: user.id,
-        group_id: group.id,
-        name: name.trim(),
-        emoji: emoji,
-        phone: phone.trim() || null,
-        is_curator: false
-      })
+    if (claimedProfile) {
+      // Claim existing profile by updating it with user_id
+      const { error: updateError } = await supabase
+        .from('members')
+        .update({
+          user_id: user.id,
+          name: name.trim(),
+          emoji: emoji,
+          phone: phone.trim() || null,
+        })
+        .eq('id', claimedProfile.id)
 
-    if (insertError) {
-      setError('Error joining group: ' + insertError.message)
+      if (updateError) {
+        setError('Error claiming profile: ' + updateError.message)
+      } else {
+        window.location.href = '/'
+      }
     } else {
-      // Refresh the page to reload group context
-      window.location.href = '/'
+      // Create new member record
+      const { error: insertError } = await supabase
+        .from('members')
+        .insert({
+          user_id: user.id,
+          group_id: group.id,
+          name: name.trim(),
+          email: user.email.toLowerCase(),
+          emoji: emoji,
+          phone: phone.trim() || null,
+          is_curator: false
+        })
+
+      if (insertError) {
+        setError('Error joining group: ' + insertError.message)
+      } else {
+        window.location.href = '/'
+      }
     }
 
     setLoading(false)
@@ -137,6 +174,9 @@ export default function JoinGroup() {
             <div className="bg-violet-900/30 border border-violet-700/50 rounded-xl p-4 text-center">
               <p className="text-violet-300 text-sm">You're joining</p>
               <p className="text-white text-xl font-bold">{group?.name}</p>
+              {claimedProfile && (
+                <p className="text-violet-300 text-xs mt-2">✓ Profile found! Claiming as {claimedProfile.name}</p>
+              )}
             </div>
 
             {/* Preview */}
@@ -202,12 +242,12 @@ export default function JoinGroup() {
               disabled={loading || !name.trim()}
               className="w-full bg-violet-600 hover:bg-violet-500 disabled:bg-slate-700 text-white font-semibold py-4 px-6 rounded-xl transition-all"
             >
-              {loading ? 'Joining...' : 'Join Group'}
+              {loading ? 'Joining...' : claimedProfile ? 'Claim Profile' : 'Join Group'}
             </button>
 
             <button
               type="button"
-              onClick={() => { setStep(1); setGroup(null); setError(''); }}
+              onClick={() => { setStep(1); setGroup(null); setClaimedProfile(null); setError(''); }}
               className="w-full text-slate-500 hover:text-slate-300 text-sm"
             >
               ← Use different code
