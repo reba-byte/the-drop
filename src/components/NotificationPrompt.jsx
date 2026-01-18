@@ -8,39 +8,45 @@ export default function NotificationPrompt() {
   const { member } = useGroup()
 
   useEffect(() => {
+    // Don't run if member isn't loaded yet
+    if (!member) return
+    
     async function checkPermission() {
       const permission = await checkNotificationPermission()
+      console.log('Permission check:', permission)
       if (permission === 'default') {
         setShowPrompt(true)
       }
     }
     checkPermission()
-  }, [])
+  }, [member])
 
   const handleEnable = async () => {
-  try {
-    const subscription = await requestNotificationPermission()
-    
-    // Save subscription to database
-    await supabase
-      .from('push_subscriptions')
-      .upsert({
-        member_id: member.id,
-        subscription: subscription.toJSON(),
-      })
-    
-    setShowPrompt(false)
-    // Remove the alert - just close silently since browser already confirmed
-  } catch (error) {
-    console.error('Error enabling notifications:', error)
-    alert('Could not enable notifications. Please try again or check your browser settings.')
+    try {
+      const subscription = await requestNotificationPermission()
+      
+      // Save subscription to database
+      await supabase
+        .from('push_subscriptions')
+        .upsert({
+          member_id: member.id,
+          subscription: subscription.toJSON(),
+        })
+      
+      setShowPrompt(false)
+    } catch (error) {
+      console.error('Error enabling notifications:', error)
+      alert('Could not enable notifications. Please try again or check your browser settings.')
+    }
   }
-}
 
   const handleDismiss = () => {
     setShowPrompt(false)
   }
 
+  // Don't render anything if member isn't loaded
+  if (!member) return null
+  
   if (!showPrompt) return null
 
   return (
