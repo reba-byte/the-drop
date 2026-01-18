@@ -5,6 +5,13 @@ import { AuthProvider } from './context/AuthContext'
 import { GroupProvider } from './context/GroupContext'
 import './index.css'
 import App from './App.jsx'
+import OneSignal from 'react-onesignal';
+
+// Initialize OneSignal
+OneSignal.init({
+  appId: "d1ed5b32-2eed-44b7-9b70-747de55a3573",
+  allowLocalhostAsSecureOrigin: true,
+});
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

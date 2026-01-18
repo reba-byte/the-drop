@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useGroup } from '../context/GroupContext'
 import { supabase } from '../lib/supabase'
+import NotificationPrompt from '../components/NotificationPrompt'
 
 export default function Home() {
   const navigate = useNavigate()
@@ -76,6 +77,7 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4">
+      <NotificationPrompt />
       <div className="max-w-md mx-auto pt-8">
         
         {/* Header */}
