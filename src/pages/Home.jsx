@@ -82,33 +82,14 @@ export default function Home() {
         
 {/* Header with Logo */}
 <div className="text-center mb-8">
-  <div className="inline-block mb-3 relative">
-    {/* Glowing background effect */}
-    <div className="absolute inset-0 bg-red-500 blur-xl opacity-30 animate-pulse"></div>
-    
-    {/* Main badge */}
-    <div className="relative bg-gradient-to-br from-slate-900 to-black border-2 border-red-500 rounded-lg px-6 py-3 shadow-2xl">
-      <div className="flex items-center gap-3">
-        {/* Lightning bolt SVG */}
-        <svg width="35" height="35" viewBox="0 0 35 35" className="drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]">
-          <path 
-            d="M20 2 L8 18 L16 18 L14 32 L28 14 L19 14 Z" 
-            fill="#ef4444"
-            stroke="#fca5a5"
-            strokeWidth="1"
-          />
-        </svg>
-        <div>
-          <h1 className="text-3xl font-black text-white tracking-wider uppercase" style={{textShadow: '0 0 10px rgba(239,68,68,0.5)'}}>
-            THE DROP
-          </h1>
-        </div>
-        {/* Target/crosshair accent */}
-        <div className="w-8 h-8 rounded-full border-2 border-red-500 flex items-center justify-center">
-          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-        </div>
-      </div>
-    </div>
+  <div className="inline-block mb-3">
+    <h1 className="text-5xl font-black text-white tracking-wider uppercase relative">
+      <span className="absolute inset-0 blur-md text-violet-400">THE DROP</span>
+      <span className="absolute inset-0 blur-sm text-violet-300">THE DROP</span>
+      <span className="relative text-white" style={{textShadow: '0 0 20px rgba(139, 92, 246, 0.8), 0 0 40px rgba(139, 92, 246, 0.4)'}}>
+        THE DROP
+      </span>
+    </h1>
   </div>
   <p className="text-slate-400 text-sm uppercase tracking-widest">{group.name}</p>
 </div>
