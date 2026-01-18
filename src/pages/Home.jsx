@@ -81,27 +81,11 @@ useEffect(() => {
       <div className="max-w-md mx-auto pt-8">
         
         {/* Header */}
-        <div className="text-center mb-8">
-  <div className="inline-block mb-3">
-    <svg width="80" height="80" viewBox="0 0 80 80" className="drop-logo">
-      <defs>
-        <linearGradient id="dropGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" style={{stopColor: '#a855f7', stopOpacity: 1}} />
-          <stop offset="100%" style={{stopColor: '#7c3aed', stopOpacity: 1}} />
-        </linearGradient>
-      </defs>
-      {/* Water droplet shape */}
-      <path 
-        d="M 40 10 Q 50 25, 55 35 Q 60 45, 60 55 Q 60 70, 40 75 Q 20 70, 20 55 Q 20 45, 25 35 Q 30 25, 40 10 Z" 
-        fill="url(#dropGradient)"
-        className="animate-bounce"
-      />
-      {/* Sparkle */}
-      <circle cx="35" cy="30" r="3" fill="white" opacity="0.8" />
-      <circle cx="48" cy="45" r="2" fill="white" opacity="0.6" />
-    </svg>
+       <div className="text-center mb-8">
+  <div className="inline-flex items-center gap-3 bg-gradient-to-r from-violet-600 to-purple-600 px-6 py-3 rounded-2xl shadow-lg mb-3">
+    <span className="text-3xl">🔥</span>
+    <h1 className="text-3xl font-bold text-white">The Drop</h1>
   </div>
-  <h1 className="text-3xl font-bold text-white mb-2">The Drop</h1>
   <p className="text-slate-400">{group.name}</p>
 </div>
 
