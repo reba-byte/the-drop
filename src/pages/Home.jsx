@@ -86,6 +86,13 @@ useEffect(() => {
           <p className="text-slate-400">{group.name}</p>
         </div>
 
+<button 
+  onClick={() => OneSignal.Slidedown.promptPush()} 
+  className="bg-red-600 text-white p-4 rounded"
+>
+  TEST: Show Notification Prompt
+</button>
+
 {/* User info */}
 <button 
   onClick={() => navigate('/profile')}
