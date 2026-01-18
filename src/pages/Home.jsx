@@ -85,22 +85,6 @@ useEffect(() => {
           <h1 className="text-3xl font-bold text-white mb-2">The Drop</h1>
           <p className="text-slate-400">{group.name}</p>
         </div>
-<div className="bg-yellow-500 text-black p-4 mb-4">
-  <p>OneSignal Debug:</p>
-  <button onClick={() => {
-    const isLoaded = typeof window.OneSignal !== 'undefined'
-    const isInit = window.OneSignal?.initialized
-    alert(`OneSignal Loaded: ${isLoaded}\nInitialized: ${isInit}`)
-  }} className="bg-white p-2 rounded mt-2">
-    Check OneSignal Status
-  </button>
-</div>
-<button 
-  onClick={() => OneSignal.Slidedown.promptPush()} 
-  className="bg-red-600 text-white p-4 rounded"
->
-  TEST: Show Notification Prompt
-</button>
 
 {/* User info */}
 <button 
