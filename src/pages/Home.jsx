@@ -88,11 +88,11 @@ useEffect(() => {
 <div className="bg-yellow-500 text-black p-4 mb-4">
   <p>OneSignal Debug:</p>
   <button onClick={() => {
-    console.log('OneSignal object:', window.OneSignal)
-    console.log('Is initialized?', window.OneSignal?.initialized)
-    alert('Check console')
-  }} className="bg-white p-2 rounded">
-    Check OneSignal
+    const isLoaded = typeof window.OneSignal !== 'undefined'
+    const isInit = window.OneSignal?.initialized
+    alert(`OneSignal Loaded: ${isLoaded}\nInitialized: ${isInit}`)
+  }} className="bg-white p-2 rounded mt-2">
+    Check OneSignal Status
   </button>
 </div>
 <button 
