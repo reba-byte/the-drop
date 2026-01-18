@@ -6,7 +6,7 @@ export default function FamilyPoll({ week, onAnswer, answers, myAnswer }) {
   const { group } = useGroup()
   const [members, setMembers] = useState([])
   const [selected, setSelected] = useState(myAnswer?.answer || null)
-  const [revealed, setRevealed] = useState(!!myAnswer)
+  const [revealed, setRevealed] = useState(week.shouldReveal)
 
   useEffect(() => {
     async function loadMembers() {
@@ -24,15 +24,15 @@ export default function FamilyPoll({ week, onAnswer, answers, myAnswer }) {
   useEffect(() => {
     if (myAnswer) {
       setSelected(myAnswer.answer)
-      setRevealed(true)
     }
-  }, [myAnswer])
+    setRevealed(week.shouldReveal)
+  }, [myAnswer, week.shouldReveal])
 
   const handleSelect = async (memberId) => {
     if (selected) return
     setSelected(memberId)
     await onAnswer(memberId)
-    setRevealed(true)
+    // Don't set revealed here - let parent control it
   }
 
   // Count votes for each member
@@ -53,9 +53,12 @@ export default function FamilyPoll({ week, onAnswer, answers, myAnswer }) {
           <button
             key={m.id}
             onClick={() => handleSelect(m.id)}
+            disabled={!!selected}
             className={`w-full p-4 rounded-xl flex items-center justify-between transition-all ${
               selected === m.id
                 ? 'bg-amber-600 text-white'
+                : selected
+                ? 'bg-slate-800 opacity-50 cursor-not-allowed text-white'
                 : 'bg-slate-800 active:bg-slate-700 text-white'
             }`}
           >
@@ -79,6 +82,13 @@ export default function FamilyPoll({ week, onAnswer, answers, myAnswer }) {
         ))}
       </div>
 
+      {/* Show different messages based on state */}
+      {selected && !revealed && (
+        <div className="mt-6 text-center text-slate-400 text-sm">
+          ✓ Vote cast! Waiting for others to answer...
+        </div>
+      )}
+      
       {revealed && (
         <div className="mt-6 text-center text-slate-400 text-sm">
           {answers.length === 1 

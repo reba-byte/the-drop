@@ -6,7 +6,7 @@ export default function Prediction({ week, onAnswer, answers, myAnswer }) {
   const { group } = useGroup()
   const [members, setMembers] = useState([])
   const [selectedMember, setSelectedMember] = useState(null)
-  const [revealed, setRevealed] = useState(!!myAnswer)
+  const [revealed, setRevealed] = useState(week.shouldReveal)
 
   useEffect(() => {
     async function loadMembers() {
@@ -24,15 +24,15 @@ export default function Prediction({ week, onAnswer, answers, myAnswer }) {
   useEffect(() => {
     if (myAnswer) {
       setSelectedMember(myAnswer.answer)
-      setRevealed(true)
     }
-  }, [myAnswer])
+    setRevealed(week.shouldReveal)
+  }, [myAnswer, week.shouldReveal])
 
   const handleSelect = async (memberId) => {
-    if (revealed) return
+    if (selectedMember) return
     setSelectedMember(memberId)
     await onAnswer(memberId)
-    setRevealed(true)
+    // Don't set revealed here - let parent control it
   }
 
   // Count votes for each member
@@ -61,9 +61,12 @@ export default function Prediction({ week, onAnswer, answers, myAnswer }) {
             <button
               key={member.id}
               onClick={() => handleSelect(member.id)}
+              disabled={!!selectedMember}
               className={`w-full p-4 rounded-xl flex items-center gap-3 transition-all ${
                 selectedMember === member.id
                   ? 'bg-indigo-600 text-white ring-2 ring-indigo-400'
+                  : selectedMember
+                  ? 'bg-slate-800 opacity-50 cursor-not-allowed text-white'
                   : 'bg-slate-800 hover:bg-slate-700 text-white'
               }`}
             >
@@ -71,6 +74,13 @@ export default function Prediction({ week, onAnswer, answers, myAnswer }) {
               <span className="font-medium">{member.name}</span>
             </button>
           ))}
+          
+          {/* Show waiting message after prediction made */}
+          {selectedMember && (
+            <div className="mt-6 text-center text-slate-400 text-sm">
+              ✓ Prediction made! Waiting for others to answer...
+            </div>
+          )}
         </div>
       ) : (
         <div className="space-y-4">
