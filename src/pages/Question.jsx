@@ -64,11 +64,11 @@ export default function Question() {
       setMyAnswer(mine || null)
 
       // Get total ACTIVE member count (only those who have signed up)
+// Get total member count (including placeholders)
 const { data: membersData } = await supabase
   .from('members')
   .select('id')
   .eq('group_id', weekData.group_id)
-  .not('user_id', 'is', null)
 
 const totalMembers = membersData?.length || 0
 const allAnswered = answersData?.length >= totalMembers && totalMembers > 0
