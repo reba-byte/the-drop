@@ -1,16 +1,25 @@
 import { useState, useEffect } from 'react'
+import { supabase } from '../../lib/supabase'
+import { useGroup } from '../../context/GroupContext'
 
 export default function Prediction({ week, onAnswer, answers, myAnswer }) {
+  const { group } = useGroup()
+  const [members, setMembers] = useState([])
   const [selectedMember, setSelectedMember] = useState(null)
   const [revealed, setRevealed] = useState(!!myAnswer)
-  
-  // Sample family members - will come from group data in real app
-  const familyMembers = [
-    { id: 'dad', name: 'Dad', emoji: '👨' },
-    { id: 'jake', name: 'Jake', emoji: '🧑' },
-    { id: 'emma', name: 'Emma', emoji: '👧' },
-    { id: 'lily', name: 'Lily', emoji: '🦋' },
-  ]
+
+  useEffect(() => {
+    async function loadMembers() {
+      const { data } = await supabase
+        .from('members')
+        .select('*')
+        .eq('group_id', group.id)
+
+      setMembers(data || [])
+    }
+
+    if (group) loadMembers()
+  }, [group])
 
   useEffect(() => {
     if (myAnswer) {
@@ -48,7 +57,7 @@ export default function Prediction({ week, onAnswer, answers, myAnswer }) {
       {!revealed ? (
         <div className="space-y-3">
           <p className="text-center text-slate-400 text-sm mb-4">Make your prediction:</p>
-          {familyMembers.map(member => (
+          {members.map(member => (
             <button
               key={member.id}
               onClick={() => handleSelect(member.id)}
@@ -68,7 +77,7 @@ export default function Prediction({ week, onAnswer, answers, myAnswer }) {
           <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
             <p className="text-slate-400 text-sm mb-3">Predictions:</p>
             <div className="space-y-2">
-              {familyMembers.map(member => {
+              {members.map(member => {
                 const votes = voteCounts[member.id] || 0
                 const isWinner = member.id === winner
                 const percentage = answers.length > 0 ? Math.round((votes / answers.length) * 100) : 0
@@ -98,7 +107,7 @@ export default function Prediction({ week, onAnswer, answers, myAnswer }) {
             <p className="text-slate-400 text-sm mb-3">Who predicted what:</p>
             <div className="space-y-2">
               {answers.map((answer) => {
-                const predicted = familyMembers.find(m => m.id === answer.answer)
+                const predicted = members.find(m => m.id === answer.answer)
                 return (
                   <div key={answer.id} className="flex items-center gap-2 text-sm">
                     <span>{answer.member?.emoji}</span>
