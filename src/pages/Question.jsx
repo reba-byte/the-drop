@@ -20,8 +20,8 @@ const colorMap = {
   confession: 'from-emerald-950',
   'this-or-that': 'from-purple-950',
   trivia: 'from-cyan-950',
-  'rank-these': 'from-orange-950',     // ADD THIS
-  'prediction': 'from-indigo-950',      // ADD THIS
+  'rank-these': 'from-orange-950',
+  'prediction': 'from-indigo-950',
 }
 
 export default function Question() {
@@ -34,59 +34,59 @@ export default function Question() {
   const [myAnswer, setMyAnswer] = useState(null)
   const [loading, setLoading] = useState(true)
 
-useEffect(() => {
-  async function loadQuestion() {
-    // Get the week
-    const { data: weekData, error: weekError } = await supabase
-      .from('weeks')
-      .select('*')
-      .eq('id', id)
-      .single()
+  useEffect(() => {
+    async function loadQuestion() {
+      // Get the week
+      const { data: weekData, error: weekError } = await supabase
+        .from('weeks')
+        .select('*')
+        .eq('id', id)
+        .single()
 
-    if (weekError) {
-      console.log('Error loading week:', weekError.message)
+      if (weekError) {
+        console.log('Error loading week:', weekError.message)
+        setLoading(false)
+        return
+      }
+
+      setWeek(weekData)
+
+      // Get all answers for this week
+      const { data: answersData } = await supabase
+        .from('answers')
+        .select('*, member:members(name, emoji)')
+        .eq('week_id', id)
+
+      setAnswers(answersData || [])
+
+      // Check if I already answered
+      const mine = answersData?.find(a => a.member_id === member?.id)
+      setMyAnswer(mine || null)
+
+      // Get total member count for this group
+      const { data: membersData } = await supabase
+        .from('members')
+        .select('id')
+        .eq('group_id', weekData.group_id)
+
+      const totalMembers = membersData?.length || 0
+      const allAnswered = answersData?.length >= totalMembers
+
+      // Check if results should be revealed
+      const now = new Date()
+      const revealsAt = weekData.reveals_at ? new Date(weekData.reveals_at) : null
+      const shouldReveal = allAnswered || (revealsAt && now >= revealsAt)
+
+      // Store this for the question components
+      weekData.shouldReveal = shouldReveal
+      weekData.allAnswered = allAnswered
+      setWeek({...weekData})
+
       setLoading(false)
-      return
     }
 
-    setWeek(weekData)
-
-    // Get all answers for this week
-    const { data: answersData } = await supabase
-      .from('answers')
-      .select('*, member:members(name, emoji)')
-      .eq('week_id', id)
-
-    setAnswers(answersData || [])
-
-    // Check if I already answered
-    const mine = answersData?.find(a => a.member_id === member?.id)
-    setMyAnswer(mine || null)
-
-    // Get total member count for this group
-    const { data: membersData } = await supabase
-      .from('members')
-      .select('id')
-      .eq('group_id', weekData.group_id)
-
-    const totalMembers = membersData?.length || 0
-    const allAnswered = answersData?.length >= totalMembers
-
-    // Check if results should be revealed
-    const now = new Date()
-    const revealsAt = weekData.reveals_at ? new Date(weekData.reveals_at) : null
-    const shouldReveal = allAnswered || (revealsAt && now >= revealsAt)
-
-    // Store this for the question components
-    weekData.shouldReveal = shouldReveal
-    weekData.allAnswered = allAnswered
-    setWeek({...weekData})
-
-    setLoading(false)
-  }
-
-  loadQuestion()
-}, [id, member])
+    loadQuestion()
+  }, [id, member])
 
   const handleAnswer = async (answer) => {
     // Save to database
@@ -129,35 +129,35 @@ useEffect(() => {
   const bgColor = colorMap[week.type] || 'from-slate-950'
 
   const renderQuestion = () => {
-  const props = { 
-    week, 
-    onAnswer: handleAnswer, 
-    answers, 
-    myAnswer,
-    member 
+    const props = { 
+      week, 
+      onAnswer: handleAnswer, 
+      answers, 
+      myAnswer,
+      member 
+    }
+    
+    switch (week.type) {
+      case 'debate':
+        return <Debate {...props} />
+      case 'family-poll':
+        return <FamilyPoll {...props} />
+      case 'hot-take':
+        return <HotTake {...props} />
+      case 'confession':
+        return <Confession {...props} />
+      case 'this-or-that':
+        return <ThisOrThat {...props} />
+      case 'trivia':
+        return <Trivia {...props} />
+      case 'rank-these':
+        return <RankThese {...props} />
+      case 'prediction':
+        return <Prediction {...props} />
+      default:
+        return <Debate {...props} />
+    }
   }
-  
-  switch (week.type) {
-    case 'debate':
-      return <Debate {...props} />
-    case 'family-poll':
-      return <FamilyPoll {...props} />
-    case 'hot-take':
-      return <HotTake {...props} />
-    case 'confession':
-      return <Confession {...props} />
-    case 'this-or-that':
-      return <ThisOrThat {...props} />
-    case 'trivia':
-      return <Trivia {...props} />
-    case 'rank-these':
-      return <RankThese {...props} />
-    case 'prediction':
-      return <Prediction {...props} />
-    default:
-      return <Debate {...props} />
-  }
-}
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${bgColor} via-slate-900 to-slate-950 p-4`}>
@@ -181,16 +181,19 @@ useEffect(() => {
           </span>
         </div>
 
-{/* Reactions to Question Results */}
-<div className="bg-slate-800/30 rounded-xl p-4 mb-6">
-  <h3 className="text-slate-400 text-sm font-medium mb-3 uppercase tracking-wider">
-    React to Results
-  </h3>
-  <Reactions targetId={week.id} type="question" />
-</div>
-
         {/* Question component */}
         {renderQuestion()}
+
+        {/* Reactions to Question Results - only show after results revealed */}
+        {week.shouldReveal && myAnswer && (
+          <div className="bg-slate-800/30 rounded-xl p-4 mt-6 mb-6">
+            <h3 className="text-slate-400 text-sm font-medium mb-3 uppercase tracking-wider">
+              React to Results
+            </h3>
+            <Reactions targetId={week.id} type="question" />
+          </div>
+        )}
+
         {/* Comments - show after user has answered */}
         {myAnswer && <Comments weekId={id} />}
         

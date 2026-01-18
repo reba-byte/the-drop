@@ -233,6 +233,19 @@ const newWeek = {
 
         <h1 className="text-2xl font-bold text-white mb-6">Manage Questions</h1>
 
+<button
+  onClick={() => navigate('/manage-members')}
+  className="w-full bg-slate-800/50 border border-slate-700 text-slate-300 rounded-xl p-4 mb-4 text-left"
+>
+  <div className="flex items-center justify-between">
+    <div>
+      <p className="font-semibold">👥 Manage Family</p>
+      <p className="text-sm text-slate-500">Add and remove family members</p>
+    </div>
+    <span className="text-slate-600">→</span>
+  </div>
+</button>
+
         {/* Group Settings */}
         <div className="bg-slate-800/50 rounded-xl p-4 mb-6 border border-slate-700">
           <h2 className="text-white font-semibold mb-4">Group Settings</h2>

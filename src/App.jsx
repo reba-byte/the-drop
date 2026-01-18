@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import Profile from './pages/Profile'
 import Curator from './pages/Curator'
 import JoinGroup from './pages/JoinGroup'
+import ManageMembers from './pages/ManageMembers'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -47,6 +48,11 @@ export default function App() {
 <Route path="/curator" element={
   <ProtectedRoute>
     <Curator />
+  </ProtectedRoute>
+} />
+<Route path="/manage-members" element={
+  <ProtectedRoute>
+    <ManageMembers />
   </ProtectedRoute>
 } />
 <Route path="/join" element={
