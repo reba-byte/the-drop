@@ -4,28 +4,42 @@ export async function requestNotificationPermission() {
     throw new Error('Push notifications not supported in this browser')
   }
 
+  // First, just request permission
   const permission = await Notification.requestPermission()
   
-  if (permission === 'granted') {
-    return await subscribeUserToPush()
+  if (permission !== 'granted') {
+    throw new Error('Notification permission denied')
   }
   
-  throw new Error('Notification permission denied')
+  // Wait a moment for iOS to process the permission
+  await new Promise(resolve => setTimeout(resolve, 500))
+  
+  // Then subscribe
+  return await subscribeUserToPush()
 }
 
 async function subscribeUserToPush() {
+  // Make sure service worker is ready
   const registration = await navigator.serviceWorker.ready
   
-  // Get the subscription
+  // Check if already subscribed
   let subscription = await registration.pushManager.getSubscription()
   
-  if (!subscription) {
-    // Create new subscription
-    subscription = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_VAPID_PUBLIC_KEY)
-    })
+  if (subscription) {
+    return subscription
   }
+  
+  // Get the VAPID key
+  const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY
+  if (!vapidKey) {
+    throw new Error('VAPID key not configured')
+  }
+  
+  // Create new subscription
+  subscription = await registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(vapidKey)
+  })
   
   return subscription
 }
@@ -42,11 +56,9 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 export async function checkNotificationPermission() {
-  // More thorough check for Safari
   if (!('Notification' in window)) return 'unsupported'
   if (!('serviceWorker' in navigator)) return 'unsupported'
   if (!('PushManager' in window)) return 'unsupported'
   
-  // Return the actual permission state
   return Notification.permission
 }

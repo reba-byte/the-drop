@@ -33,23 +33,27 @@ export default function NotificationPrompt() {
   }, [member, showPrompt])
 
   const handleEnable = async () => {
-    try {
-      const subscription = await requestNotificationPermission()
-      
-      // Save subscription to database
-      await supabase
-        .from('push_subscriptions')
-        .upsert({
-          member_id: member.id,
-          subscription: subscription.toJSON(),
-        })
-      
-      setShowPrompt(false)
-    } catch (error) {
-      console.error('Error enabling notifications:', error)
-      alert('Could not enable notifications. Please try again or check your browser settings.')
-    }
+  try {
+    alert('Starting subscription...')
+    const subscription = await requestNotificationPermission()
+    alert('Got subscription, saving to DB...')
+    
+    // Save subscription to database
+    await supabase
+      .from('push_subscriptions')
+      .upsert({
+        member_id: member.id,
+        subscription: subscription.toJSON(),
+      })
+    
+    alert('Success! 🎉')
+    setShowPrompt(false)
+  } catch (error) {
+    console.error('Full error:', error)
+    // Show the actual error
+    alert('ERROR:\n' + error.message + '\n\nType: ' + error.name + '\n\nStack: ' + (error.stack || 'no stack'))
   }
+}
 
   const handleDismiss = () => {
     setShowPrompt(false)
