@@ -80,39 +80,24 @@ export default function Home() {
       <NotificationPrompt />
       <div className="max-w-md mx-auto pt-8">
         
-        {/* Header with Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-block mb-3">
-            <div className="relative">
-              {/* Bold outlined badge */}
-              <div className="border-4 border-violet-500 rounded-2xl px-8 py-4 bg-slate-900/50 backdrop-blur-sm shadow-2xl transform hover:scale-105 transition-transform">
-                <div className="flex items-center gap-4">
-                  {/* Flame icon - custom SVG */}
-                  <svg width="40" height="40" viewBox="0 0 40 40" className="animate-pulse">
-                    <defs>
-                      <linearGradient id="flameGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style={{stopColor: '#f59e0b', stopOpacity: 1}} />
-                        <stop offset="50%" style={{stopColor: '#ef4444', stopOpacity: 1}} />
-                        <stop offset="100%" style={{stopColor: '#dc2626', stopOpacity: 1}} />
-                      </linearGradient>
-                    </defs>
-                    <path 
-                      d="M20 5 Q 25 12, 28 18 Q 30 22, 30 27 Q 30 35, 20 38 Q 10 35, 10 27 Q 10 22, 12 18 Q 15 12, 20 5 Z" 
-                      fill="url(#flameGradient)"
-                    />
-                    <path 
-                      d="M20 15 Q 22 18, 23 21 Q 24 24, 24 27 Q 24 31, 20 33 Q 16 31, 16 27 Q 16 24, 17 21 Q 18 18, 20 15 Z" 
-                      fill="#fbbf24"
-                      opacity="0.7"
-                    />
-                  </svg>
-                  <h1 className="text-4xl font-black text-white tracking-tight">THE DROP</h1>
-                </div>
-              </div>
-            </div>
-          </div>
-          <p className="text-slate-400">{group.name}</p>
+{/* Header with Logo */}
+<div className="text-center mb-8">
+  <div className="inline-block mb-3">
+    <div className="relative">
+      {/* Bold outlined badge */}
+      <div className="border-4 border-violet-500 rounded-2xl px-8 py-4 bg-slate-900/50 backdrop-blur-sm shadow-2xl transform hover:scale-105 transition-transform">
+        <div className="flex items-center gap-4">
+          {/* Flame icon - custom SVG */}
+          <svg width="40" height="40" viewBox="0 0 40 40" className="animate-pulse">
+            ...
+          </svg>
+          <h1 className="text-4xl font-black text-white tracking-tight">THE DROP</h1>
         </div>
+      </div>
+    </div>
+  </div>
+  <p className="text-slate-400">{group.name}</p>
+</div>
 
         {/* User info */}
         <button 
