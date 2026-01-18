@@ -1,17 +1,28 @@
 export async function requestNotificationPermission() {
-  // Check if notifications are supported
-  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
-    throw new Error('Push notifications not supported in this browser')
+  // Wait for service worker to be ready first
+  if (!('serviceWorker' in navigator)) {
+    throw new Error('Service workers not supported')
+  }
+  
+  await navigator.serviceWorker.ready
+  
+  // Now check push support
+  if (!('Notification' in window)) {
+    throw new Error('Notifications not supported')
+  }
+  
+  if (!('PushManager' in window)) {
+    throw new Error('Push notifications not supported')
   }
 
-  // First, just request permission
+  // Request permission
   const permission = await Notification.requestPermission()
   
   if (permission !== 'granted') {
     throw new Error('Notification permission denied')
   }
   
-  // Wait a moment for iOS to process the permission
+  // Wait a moment for iOS to process
   await new Promise(resolve => setTimeout(resolve, 500))
   
   // Then subscribe
