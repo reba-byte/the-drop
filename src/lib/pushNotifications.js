@@ -1,6 +1,7 @@
 export async function requestNotificationPermission() {
-  if (!('Notification' in window)) {
-    throw new Error('Notifications not supported')
+  // Check if notifications are supported
+  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+    throw new Error('Push notifications not supported in this browser')
   }
 
   const permission = await Notification.requestPermission()
@@ -41,6 +42,11 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 export async function checkNotificationPermission() {
+  // More thorough check for Safari
   if (!('Notification' in window)) return 'unsupported'
+  if (!('serviceWorker' in navigator)) return 'unsupported'
+  if (!('PushManager' in window)) return 'unsupported'
+  
+  // Return the actual permission state
   return Notification.permission
 }
