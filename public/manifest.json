@@ -1,0 +1,16 @@
+{
+  "name": "The Drop",
+  "short_name": "The Drop",
+  "description": "Weekly family questions",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
