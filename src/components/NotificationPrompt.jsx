@@ -8,15 +8,10 @@ export default function NotificationPrompt() {
   const { member } = useGroup()
 
   useEffect(() => {
-    // Don't run if member isn't loaded yet
     if (!member) return
     
     async function checkPermission() {
       const permission = await checkNotificationPermission()
-      console.log('Permission check:', permission)
-      
-      // On iOS, if permission is default OR unsupported, show prompt
-      // (unsupported means not added to home screen yet)
       if (permission === 'default' || permission === 'unsupported') {
         setShowPrompt(true)
       }
@@ -26,11 +21,8 @@ export default function NotificationPrompt() {
 
   const handleEnable = async () => {
     try {
-      alert('Starting subscription...')
       const subscription = await requestNotificationPermission()
-      alert('Got subscription, saving to DB...')
       
-      // Save subscription to database
       await supabase
         .from('push_subscriptions')
         .upsert({
@@ -38,11 +30,10 @@ export default function NotificationPrompt() {
           subscription: subscription.toJSON(),
         })
       
-      alert('Success! 🎉')
       setShowPrompt(false)
     } catch (error) {
-      console.error('Full error:', error)
-      alert('ERROR:\n' + error.message + '\n\nType: ' + error.name + '\n\nStack: ' + (error.stack || 'no stack'))
+      console.error('Error enabling notifications:', error)
+      alert('Could not enable notifications. Please try again or check your browser settings.')
     }
   }
 
@@ -50,9 +41,7 @@ export default function NotificationPrompt() {
     setShowPrompt(false)
   }
 
-  // Don't render anything if member isn't loaded
   if (!member) return null
-  
   if (!showPrompt) return null
 
   return (
