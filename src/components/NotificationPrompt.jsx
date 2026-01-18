@@ -58,7 +58,8 @@ export default function NotificationPrompt() {
   // Don't render anything if member isn't loaded
   if (!member) return null
   
-  if (!showPrompt) return null
+ // Temporarily comment out so we always see debug
+// if (!showPrompt) return null 
 
   return (
     <>
