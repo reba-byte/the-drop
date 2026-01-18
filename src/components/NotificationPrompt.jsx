@@ -21,14 +21,24 @@ export default function NotificationPrompt() {
     checkPermission()
   }, [])
 
-  const handleEnable = async () => {
+const handleEnable = async () => {
+  console.log('Enable clicked')
+  try {
+    const result = await OneSignal.Notifications.requestPermission()
+    console.log('Permission result:', result)
+    setShowPrompt(false)
+  } catch (error) {
+    console.error('Error requesting permission:', error)
+    // Try alternative method
     try {
-      await OneSignal.Notifications.requestPermission()
+      await OneSignal.Slidedown.promptPush()
       setShowPrompt(false)
-    } catch (error) {
-      console.error('Error requesting permission:', error)
+    } catch (err2) {
+      console.error('Second attempt failed:', err2)
+      alert('Could not enable notifications. Please check your browser settings.')
     }
   }
+}
 
   const handleDismiss = () => {
     setShowPrompt(false)
