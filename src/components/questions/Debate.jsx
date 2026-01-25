@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export default function Debate({ week, onAnswer, answers, myAnswer, member }) {
-  const [selected, setSelected] = useState(myAnswer?.answer || null)
+export default function Debate({ week, onAnswer, answers, myAnswer, member, totalMembers }) {  const [selected, setSelected] = useState(myAnswer?.answer || null)
 const [revealed, setRevealed] = useState(!!myAnswer && week.shouldReveal)
   useEffect(() => {
   if (myAnswer) {
