@@ -1,6 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-// Import web-push for proper VAPID signing
 import webpush from 'npm:web-push@3.6.7'
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!
@@ -8,7 +7,6 @@ const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 const vapidPublicKey = Deno.env.get('VAPID_PUBLIC_KEY')!
 const vapidPrivateKey = Deno.env.get('VAPID_PRIVATE_KEY')!
 
-// Configure web-push with VAPID keys
 webpush.setVapidDetails(
   'mailto:notifications@thedropgame.app',
   vapidPublicKey,
@@ -20,7 +18,7 @@ serve(async (req) => {
     const payload = await req.json()
     console.log('Received webhook')
     
-    let groupId, title, body, url
+    let groupId, title, body, url, excludeMemberId
     
     if (payload.record) {
       const oldStatus = payload.old_record?.status
@@ -45,6 +43,7 @@ serve(async (req) => {
       title = payload.title
       body = payload.body
       url = payload.url
+      excludeMemberId = payload.excludeMemberId
     }
     
     console.log('Sending notification:', { title, body })
@@ -65,10 +64,24 @@ serve(async (req) => {
       })
     }
     
+    // Filter out excluded member if provided
+    let memberIds = members.map(m => m.id)
+    if (excludeMemberId) {
+      memberIds = memberIds.filter(id => id !== excludeMemberId)
+      console.log(`Excluding member ${excludeMemberId}, sending to ${memberIds.length} members`)
+    }
+    
+    if (memberIds.length === 0) {
+      return new Response(JSON.stringify({ message: 'No members to notify after exclusion' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+    
     const { data: subscriptions } = await supabase
       .from('push_subscriptions')
       .select('subscription')
-      .in('member_id', members.map(m => m.id))
+      .in('member_id', memberIds)
     
     console.log(`Found ${subscriptions?.length || 0} subscriptions`)
     
@@ -79,7 +92,6 @@ serve(async (req) => {
       })
     }
     
-    // Use web-push library to send properly signed notifications
     const notificationPayload = JSON.stringify({ title, body, url })
     
     const results = await Promise.allSettled(
