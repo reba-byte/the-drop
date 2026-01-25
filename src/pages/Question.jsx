@@ -88,27 +88,49 @@ const allAnswered = answersData?.length >= totalMembers && totalMembers > 0
     loadQuestion()
   }, [id, member])
 
-  const handleAnswer = async (answer) => {
-    // Save to database
-    const { data, error } = await supabase
-      .from('answers')
-      .insert({
-        week_id: id,
-        member_id: member.id,
-        answer: answer,
-      })
-      .select('*, member:members(name, emoji)')
-      .single()
+ const handleAnswer = async (answer) => {
+  // Save to database
+  const { data, error } = await supabase
+    .from('answers')
+    .insert({
+      week_id: id,
+      member_id: member.id,
+      answer: answer,
+    })
+    .select('*, member:members(name, emoji)')
+    .single()
 
-    if (error) {
-      console.log('Error saving answer:', error.message)
-      return
-    }
-
-    // Update local state
-    setMyAnswer(data)
-    setAnswers([...answers, data])
+  if (error) {
+    console.log('Error saving answer:', error.message)
+    return
   }
+
+  // Update local state with new answer
+  const newAnswers = [...answers, data]
+  setMyAnswer(data)
+  setAnswers(newAnswers)
+
+  // Recalculate if everyone has answered
+  const { data: membersData } = await supabase
+    .from('members')
+    .select('id')
+    .eq('group_id', week.group_id)
+
+  const totalMembers = membersData?.length || 0
+  const allAnswered = newAnswers.length >= totalMembers && totalMembers > 0
+
+  // Check if results should be revealed
+  const now = new Date()
+  const revealsAt = week.reveals_at ? new Date(week.reveals_at) : null
+  const shouldReveal = allAnswered || (revealsAt && now >= revealsAt)
+
+  // Update week state with new reveal status
+  setWeek({
+    ...week,
+    shouldReveal,
+    allAnswered
+  })
+}
 
   if (loading) {
     return (
