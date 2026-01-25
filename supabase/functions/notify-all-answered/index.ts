@@ -75,7 +75,7 @@ serve(async (req) => {
     }
     
     return new Response(
-      JSON.stringify({ message: 'Not all answered yet' }),
+      JSON.stringify({ message: 'Not all answered yet', answered: totalAnswers, total: totalMembers }),
       { headers: { 'Content-Type': 'application/json' } }
     )
     

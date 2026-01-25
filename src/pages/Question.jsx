@@ -33,6 +33,7 @@ export default function Question() {
   const [answers, setAnswers] = useState([])
   const [myAnswer, setMyAnswer] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [totalMembers, setTotalMembers] = useState(0) 
 
   useEffect(() => {
     async function loadQuestion() {
@@ -70,6 +71,7 @@ const { data: membersData } = await supabase
   .eq('group_id', weekData.group_id)
 
 const totalMembers = membersData?.length || 0
+setTotalMembers(totalMembers)
 const allAnswered = answersData?.length >= totalMembers && totalMembers > 0
 
       // Check if results should be revealed
@@ -152,12 +154,13 @@ const allAnswered = answersData?.length >= totalMembers && totalMembers > 0
 
   const renderQuestion = () => {
     const props = { 
-      week, 
-      onAnswer: handleAnswer, 
-      answers, 
-      myAnswer,
-      member 
-    }
+  week, 
+  onAnswer: handleAnswer, 
+  answers, 
+  myAnswer,
+  member,
+  totalMembers
+}
     
     switch (week.type) {
       case 'debate':

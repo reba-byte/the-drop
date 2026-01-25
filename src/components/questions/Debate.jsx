@@ -72,6 +72,13 @@ const [revealed, setRevealed] = useState(!!myAnswer && week.shouldReveal)
         </button>
       </div>
 
+      {/* Waiting message - shows after answering but before reveal */}
+        {selected && !revealed && (
+          <div className="mt-6 text-center text-slate-400 text-sm">
+            ✓ Answer submitted! {answers.length} of {totalMembers} have answered...
+          </div>
+        )}
+
       {revealed && (
         <div className="mt-6 text-center text-slate-400 text-sm">
           {answers.length === 1 
